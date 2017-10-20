@@ -1,4 +1,4 @@
-data <- read.csv("/home/aaron/policedatachallenge/Seattle_Police_Department_911_Incident_Response.csv")
+data <- read.csv("/home/aaron/policedata/Seattle_Police_Department_911_Incident_Response.csv")
 library(dplyr)
 
 unique(data$Event.Clearance.Group)
@@ -15,7 +15,10 @@ map_seattle <- get_map(location = c(lon = mean(bikedata$Longitude), lat = mean(b
                        scale = 2)
 library(tidyr)
 bikedata2 <- bikedata %>% separate(Event.Clearance.Date, c("DATE","TIME"), " ") %>% 
-             separate(DATE,c("MM","DD","YYYY"),"/")
+             separate(DATE,c("MM","DD","YYYY"),"/") %>% filter(YYYY >= 2015) %>% 
+             droplevels()
+
+write.csv(bikedata2, "/home/aaron/policedata/biketheft.csv", quote = c(18), sep = ",")
 
 ggmap(map_seattle) + 
   geom_point(data=bikedata2[which(bikedata2$YYYY == 2015 & 
