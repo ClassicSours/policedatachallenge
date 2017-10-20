@@ -18,7 +18,7 @@ bikedata2 <- bikedata %>% separate(Event.Clearance.Date, c("DATE","TIME"), " ") 
              separate(DATE,c("MM","DD","YYYY"),"/") %>% filter(YYYY >= 2015) %>% 
              droplevels()
 
-write.csv(bikedata2, "/home/aaron/policedata/biketheft.csv", quote = c(18), sep = ",")
+write.csv(bikedata2, "/home/aaron/policedata/biketheft.csv", row.names = FALSE)
 
 ggmap(map_seattle) + 
   geom_point(data=bikedata2[which(bikedata2$YYYY == 2015 & 
