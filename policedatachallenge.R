@@ -47,9 +47,8 @@ ggplot(zoning, aes(x = INTPTLON10, y = INTPTLAT10, fill = as.factor(TRACT))) +
   geom_polygon() +
   coord_map()
 
-
 library(maptools)
-kingcounty.shp <- readShapeSpatial("/home/aaron/policedata/WGS84/City_of_Seattle_Zoning.shp")
+kingcounty.shp <- maptools::readShapeSpatial("/home/aaron/policedata/WGS84/City_of_Seattle_Zoning.shp")
 
 library(broom)
 kingcounty <- broom::tidy(kingcounty.shp)
@@ -96,4 +95,22 @@ ggplot() +
              size = 1,
              shape = 21) +
   coord_map() + theme(legend.position = "none")
+
+library(mgcv)
+
+## ?in.out
+kingcounty.bnd <- do.call(rbind, lapply(split(kingcounty.all, kingcounty.all$id), 
+                      function(x) rbind(x,
+                                        within(x[nrow(x),], {lat <- NA; long <- NA}))))[,c("lat","long","id","ZONEING")]
+
+in.out(as.matrix(kingcounty.bnd[,c("lat","long")]), as.matrix(bikedata[,c("Latitude","Longitude")]))
+
+coordinates(bikedata) <- ~ Longitude + Latitude
+proj4string(bikedata) <- proj4string(bikedata)
+
+coordinates(kingcounty.all) <- ~ long + lat
+proj4string(kingcounty.all) <- proj4string(kingcounty.all)
+
+over.table <- over(kingcounty.all,SpatialPoints(bikedata))
+bikedata <- cbind(bikedata, over(kingcounty.all,bikedata))
 
